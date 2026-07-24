@@ -17,6 +17,23 @@ func NewDeployService() *DeployService {
 	return &DeployService{}
 }
 
+func (s *DeployService) BuildDockerFile(ctx context.Context) (string, error){
+
+	src := "/mini-paas/templates/dockerfile_node.txt"
+
+	source, err := os.ReadFile(src)
+
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println(string(source))
+
+	return string(source), nil
+
+}
+
+
 func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, branch string) (string, error) {
 	baseDir := "/mini-pass/deployments/"
 	
@@ -49,6 +66,9 @@ func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, bra
 		return "", err
 	}
 
+	s.BuildDockerFile(ctx)
+
 	return path, nil
 
 }
+
