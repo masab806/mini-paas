@@ -29,7 +29,8 @@ func (h *DeployHandler) DeployToServer(c *gin.Context) {
 
 	
 
-	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch)
+	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag)
+
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
