@@ -17,9 +17,22 @@ func NewDeployService() *DeployService {
 	return &DeployService{}
 }
 
-func (s *DeployService) BuildDockerFile(ctx context.Context, projectPath string, imageTag string) error {
+func (s *DeployService) BuildDockerFile(ctx context.Context, projectPath string, imageTag string, framework string) error {
 
-	src := "/mini-paas/templates/dockerfile_node.txt"
+	var templateName string
+
+	switch framework {
+	case "nodejs":
+		templateName = "dockerfile_node.txt"
+	
+	case "fastapi":
+		templateName = "dockerfile_py.txt"
+
+	default:
+		return fmt.Errorf("Unsupported Frameworks: %s", framework)
+	}
+	
+	src := filepath.Join("/mini-paas/templates", templateName)
 
 	content, err := os.ReadFile(src)
 
@@ -35,7 +48,8 @@ func (s *DeployService) BuildDockerFile(ctx context.Context, projectPath string,
 		return err
 	}
 
-	cmd := exec.Command(
+	cmd := exec.CommandContext(
+		ctx,
 		"docker",
 		"build",
 		"-t",
@@ -57,7 +71,7 @@ func (s *DeployService) BuildDockerFile(ctx context.Context, projectPath string,
 
 }
 
-func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, branch string, imageTag string) (string, error) {
+func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, branch string, imageTag string, framework string) (string, error) {
 	baseDir := "/mini-pass/deployments/"
 
 	err := os.MkdirAll(baseDir, 0755)
@@ -88,7 +102,7 @@ func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, bra
 		return "", err
 	}
 
-	err = s.BuildDockerFile(ctx, path, imageTag)
+	err = s.BuildDockerFile(ctx, path, imageTag, framework)
 
 	if err != nil {
 		return "", err

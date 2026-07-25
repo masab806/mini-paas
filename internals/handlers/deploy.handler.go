@@ -29,7 +29,7 @@ func (h *DeployHandler) DeployToServer(c *gin.Context) {
 
 	
 
-	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag)
+	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag, req.Framework)
 
 
 	if err != nil {
