@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"mini-paas/ent"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,10 +12,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type DeployService struct{}
+type DeployService struct{
+	client *ent.Client
+}
 
-func NewDeployService() *DeployService {
-	return &DeployService{}
+func NewDeployService(client *ent.Client) *DeployService {
+	return &DeployService{
+		client: client,
+	}
 }
 
 func (s *DeployService) BuildDockerFile(ctx context.Context, projectPath string, imageTag string, framework string) error {
@@ -109,5 +114,29 @@ func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, bra
 	}
 
 	return path, nil
+
+}
+
+func (s *DeployService) RunContainer(ctx context.Context, port string, containerName string, imageName string) error {
+	cmd := exec.CommandContext(
+		ctx,
+		"docker",
+		"-d",
+		"--name",
+		containerName,
+		"-p",
+		port,
+		imageName,
+	)
+
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(output))
+
+	return nil
 
 }
