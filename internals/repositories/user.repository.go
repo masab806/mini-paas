@@ -26,5 +26,5 @@ func (r *userRepository) ExistsByEmail(ctx context.Context, email string) (bool,
 }
 
 func (r *userRepository) CreateUser(ctx context.Context, email string, username string, password string) (*ent.User, error) {
-	return r.client.User.Create().SetEmail(email).SetUserName(username).SetPassword(password).Save(ctx)
+	return r.client.User.Create().SetEmail(email).SetUsername(username).SetPassword(password).Save(ctx)
 }

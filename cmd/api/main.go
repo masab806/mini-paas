@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"mini-paas/internals/config"
 	"mini-paas/internals/database"
 	"mini-paas/internals/handlers"
 	"mini-paas/internals/repositories"
@@ -13,6 +14,8 @@ import (
 )
 
 func main(){
+	config.LoadConfig()
+
 	r := gin.Default()
 
 	r.GET("/", func(c *gin.Context) {
