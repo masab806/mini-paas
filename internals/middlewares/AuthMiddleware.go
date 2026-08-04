@@ -23,7 +23,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		const bearerPrefix = "Bearer "
 
-		if !strings.HasPrefix(authheader, bearerPrefix){
+		if !strings.HasPrefix(authheader, bearerPrefix) {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"Error": "Invalid Token!",
 			})
@@ -35,8 +35,17 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		token := strings.TrimPrefix(authheader, bearerPrefix)
 
+		claims, err := config.ValidateToken(token)
 
-		config.ValidateToken(token)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"Error": "Invalid Token!",
+			})
+			c.Abort()
+			return
+		}
+
+		c.Set("claims", claims)
 
 		c.Next()
 
