@@ -81,13 +81,3 @@ func (s *UserService) LoginUser(ctx context.Context, email string, password stri
 
 }
 
-func (s *UserService) GetProfile(ctx context.Context, tokenString string) (*config.Claims, error) {
-	profile, err := config.ValidateToken(tokenString)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return profile, nil
-
-}

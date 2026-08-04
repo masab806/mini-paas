@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"mini-paas/internals/config"
 	"mini-paas/internals/dto"
 	"mini-paas/internals/services"
 	"net/http"
@@ -80,45 +81,17 @@ func (h *UserHandler) UserLogin(c *gin.Context){
 }
 
 func (h *UserHandler) GetUserProfile(c *gin.Context){
-	authHeader := c.GetHeader("Authorization")
+	value, exists := c.Get("claims")
 
-	if authHeader == "" {
-		c. JSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid Token",
-		})
-
-		return
-	}
-
-	const bearerPrefix = "Bearer "
-
-	if !strings.HasPrefix(authHeader, bearerPrefix ){
+	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid Token",
+			"Error": "Unauthorized",
 		})
 
 		return
 	}
 
-	token := strings.TrimPrefix(authHeader, bearerPrefix)
+	claims := value.(*config.Claims)
 
-	profile, err := h.service.GetProfile(c.Request.Context(), token)
-
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid Token",
-		})
-
-		return
-	}
-
-	payload := gin.H{
-		"userId":   profile.ID,
-		"email":    profile.Email,
-		"username": profile.Username,
-	}
-
-	c.JSON(http.StatusOK, payload)
-
-
+	c.JSON(http.StatusOK, claims)
 }
