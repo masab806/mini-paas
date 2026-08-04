@@ -5,6 +5,7 @@ import (
 	"errors"
 	"mini-paas/ent"
 	"mini-paas/internals/repositories"
+	"mini-paas/internals/config"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -45,6 +46,48 @@ func (s *UserService) RegisterUser(ctx context.Context, email string, username s
 
 	return newUser, nil
 
+}
 
+func (s *UserService) LoginUser(ctx context.Context, email string, password string) (string, error) {
+	exists, err := s.repo.ExistsByEmail(ctx, email)
+
+	if err != nil {
+		return "", err
+	}
+
+	if !exists {
+		return "", errors.New("Invalid Credentials")
+	}
+
+	user, userErr := s.repo.GetByEmail(ctx, email)
+
+	if userErr != nil {
+		return "", userErr
+	}
+
+	matchErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+
+	if matchErr != nil {
+		return "", matchErr
+	}
+
+	token, tokenErr := config.GenerateToken(user.Email, user.ID, user.Username)
+
+	if tokenErr != nil {
+		return "", tokenErr
+	}
+
+	return token, nil
+
+}
+
+func (s *UserService) GetProfile(ctx context.Context, tokenString string) (*config.Claims, error) {
+	profile, err := config.ValidateToken(tokenString)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return profile, nil
 
 }

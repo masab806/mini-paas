@@ -7,10 +7,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateToken(email string, userId int) (string, error) {
+func GenerateToken(email string, userId int, username string) (string, error) {
 	claims := &Claims{
 		ID:               userId,
 		Email:            email,
+		Username: 		  username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt: jwt.NewNumericDate(time.Now()),

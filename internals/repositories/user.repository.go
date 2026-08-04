@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	ExistsByEmail(ctx context.Context, email string) (bool, error)
 	CreateUser(ctx context.Context, email string, username string, password string) (*ent.User, error)
+	GetByEmail(ctx context.Context, email string) (*ent.User, error)
 }
 
 type userRepository struct {
@@ -27,4 +28,8 @@ func (r *userRepository) ExistsByEmail(ctx context.Context, email string) (bool,
 
 func (r *userRepository) CreateUser(ctx context.Context, email string, username string, password string) (*ent.User, error) {
 	return r.client.User.Create().SetEmail(email).SetUsername(username).SetPassword(password).Save(ctx)
+}
+
+func (r *userRepository) GetByEmail(ctx context.Context, email string) (*ent.User, error) {
+	return r.client.User.Query().Where(user.Email(email)).Only(ctx)
 }
