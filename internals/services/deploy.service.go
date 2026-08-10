@@ -76,7 +76,33 @@ func (s *DeployService) BuildDockerFile(ctx context.Context, projectPath string,
 
 }
 
-func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, branch string, imageTag string, framework string) (string, error) {
+func (s *DeployService) RunContainer(ctx context.Context, port string, containerName string, imageName string) error {
+	cmd := exec.CommandContext(
+		ctx,
+		"docker",
+		"run",
+		"-d",
+		"--name",
+		containerName,
+		"-p",
+		port,
+		imageName,
+	)
+
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(output))
+
+	return nil
+
+}
+
+
+func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, branch string, imageTag string, framework string, name string, port string) (string, error) {
 	baseDir := "/mini-pass/deployments/"
 
 	err := os.MkdirAll(baseDir, 0755)
@@ -109,6 +135,8 @@ func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, bra
 
 	err = s.BuildDockerFile(ctx, path, imageTag, framework)
 
+	s.RunContainer(ctx, port, name, imageTag)
+
 	if err != nil {
 		return "", err
 	}
@@ -117,26 +145,3 @@ func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, bra
 
 }
 
-func (s *DeployService) RunContainer(ctx context.Context, port string, containerName string, imageName string) error {
-	cmd := exec.CommandContext(
-		ctx,
-		"docker",
-		"-d",
-		"--name",
-		containerName,
-		"-p",
-		port,
-		imageName,
-	)
-
-	output, err := cmd.CombinedOutput()
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(string(output))
-
-	return nil
-
-}

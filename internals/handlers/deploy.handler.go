@@ -27,9 +27,10 @@ func (h *DeployHandler) DeployToServer(c *gin.Context) {
 		return
 	}
 
-	
+	claims, exists := c.Get("claims")
 
-	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag, req.Framework)
+
+	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag, req.Framework, claim, req.Port)
 
 
 	if err != nil {
