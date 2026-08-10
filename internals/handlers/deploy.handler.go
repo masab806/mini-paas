@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"mini-paas/internals/config"
 	"mini-paas/internals/dto"
 	"mini-paas/internals/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type DeployHandler struct {
@@ -27,10 +29,25 @@ func (h *DeployHandler) DeployToServer(c *gin.Context) {
 		return
 	}
 
-	claims, exists := c.Get("claims")
+	value, exists := c.Get("claims")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"Error": "Unauthorized",
+		})
+	}
+
+	randomNum := uuid.NewString()
+
+	claims := value.(*config.Claims)
+
+	containerName := claims.Username + randomNum
+	
 
 
-	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag, req.Framework, claim, req.Port)
+
+
+	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag, req.Framework, containerName, req.Port)
 
 
 	if err != nil {
