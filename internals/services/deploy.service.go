@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type DeployService struct{
+type DeployService struct {
 	client *ent.Client
 }
 
@@ -29,14 +29,14 @@ func (s *DeployService) BuildDockerFile(ctx context.Context, projectPath string,
 	switch framework {
 	case "nodejs":
 		templateName = "dockerfile_node.txt"
-	
+
 	case "fastapi":
 		templateName = "dockerfile_py.txt"
 
 	default:
 		return fmt.Errorf("Unsupported Frameworks: %s", framework)
 	}
-	
+
 	src := filepath.Join("/mini-paas/templates", templateName)
 
 	content, err := os.ReadFile(src)
@@ -82,12 +82,12 @@ func (s *DeployService) RunContainer(ctx context.Context, port string, container
 		"docker",
 		"run",
 		"-d",
-		"--name",
-		containerName,
-		"-p",
-		port,
+		"--name", containerName, 
+		"-p", port, 
 		imageName,
 	)
+
+
 
 	output, err := cmd.CombinedOutput()
 
@@ -100,7 +100,6 @@ func (s *DeployService) RunContainer(ctx context.Context, port string, container
 	return nil
 
 }
-
 
 func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, branch string, imageTag string, framework string, name string, port string) (string, error) {
 	baseDir := "/mini-pass/deployments/"
@@ -135,7 +134,11 @@ func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, bra
 
 	err = s.BuildDockerFile(ctx, path, imageTag, framework)
 
-	s.RunContainer(ctx, port, name, imageTag)
+	containerErr := s.RunContainer(ctx, port, name, imageTag)
+
+	if containerErr != nil {
+		return "", containerErr
+	}
 
 	if err != nil {
 		return "", err
@@ -144,4 +147,3 @@ func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, bra
 	return path, nil
 
 }
-

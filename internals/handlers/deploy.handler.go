@@ -5,6 +5,7 @@ import (
 	"mini-paas/internals/dto"
 	"mini-paas/internals/services"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -42,12 +43,10 @@ func (h *DeployHandler) DeployToServer(c *gin.Context) {
 	claims := value.(*config.Claims)
 
 	containerName := claims.Username + randomNum
+
+	sanitizedName := strings.ReplaceAll(containerName, " ", "-")
 	
-
-
-
-
-	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag, req.Framework, containerName, req.Port)
+	deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag, req.Framework, sanitizedName, req.Port)
 
 
 	if err != nil {
