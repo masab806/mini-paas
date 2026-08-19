@@ -76,20 +76,6 @@ func (_c *DeploymentsCreate) SetNillableCreatedAt(v *time.Time) *DeploymentsCrea
 	return _c
 }
 
-// SetFinishedAt sets the "finished_at" field.
-func (_c *DeploymentsCreate) SetFinishedAt(v time.Time) *DeploymentsCreate {
-	_c.mutation.SetFinishedAt(v)
-	return _c
-}
-
-// SetNillableFinishedAt sets the "finished_at" field if the given value is not nil.
-func (_c *DeploymentsCreate) SetNillableFinishedAt(v *time.Time) *DeploymentsCreate {
-	if v != nil {
-		_c.SetFinishedAt(*v)
-	}
-	return _c
-}
-
 // SetID sets the "id" field.
 func (_c *DeploymentsCreate) SetID(v uuid.UUID) *DeploymentsCreate {
 	_c.mutation.SetID(v)
@@ -252,10 +238,6 @@ func (_c *DeploymentsCreate) createSpec() (*Deployments, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(deployments.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
-	}
-	if value, ok := _c.mutation.FinishedAt(); ok {
-		_spec.SetField(deployments.FieldFinishedAt, field.TypeTime, value)
-		_node.FinishedAt = &value
 	}
 	if nodes := _c.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

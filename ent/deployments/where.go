@@ -81,11 +81,6 @@ func CreatedAt(v time.Time) predicate.Deployments {
 	return predicate.Deployments(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// FinishedAt applies equality check predicate on the "finished_at" field. It's identical to FinishedAtEQ.
-func FinishedAt(v time.Time) predicate.Deployments {
-	return predicate.Deployments(sql.FieldEQ(FieldFinishedAt, v))
-}
-
 // BranchEQ applies the EQ predicate on the "branch" field.
 func BranchEQ(v string) predicate.Deployments {
 	return predicate.Deployments(sql.FieldEQ(FieldBranch, v))
@@ -384,56 +379,6 @@ func CreatedAtLT(v time.Time) predicate.Deployments {
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Deployments {
 	return predicate.Deployments(sql.FieldLTE(FieldCreatedAt, v))
-}
-
-// FinishedAtEQ applies the EQ predicate on the "finished_at" field.
-func FinishedAtEQ(v time.Time) predicate.Deployments {
-	return predicate.Deployments(sql.FieldEQ(FieldFinishedAt, v))
-}
-
-// FinishedAtNEQ applies the NEQ predicate on the "finished_at" field.
-func FinishedAtNEQ(v time.Time) predicate.Deployments {
-	return predicate.Deployments(sql.FieldNEQ(FieldFinishedAt, v))
-}
-
-// FinishedAtIn applies the In predicate on the "finished_at" field.
-func FinishedAtIn(vs ...time.Time) predicate.Deployments {
-	return predicate.Deployments(sql.FieldIn(FieldFinishedAt, vs...))
-}
-
-// FinishedAtNotIn applies the NotIn predicate on the "finished_at" field.
-func FinishedAtNotIn(vs ...time.Time) predicate.Deployments {
-	return predicate.Deployments(sql.FieldNotIn(FieldFinishedAt, vs...))
-}
-
-// FinishedAtGT applies the GT predicate on the "finished_at" field.
-func FinishedAtGT(v time.Time) predicate.Deployments {
-	return predicate.Deployments(sql.FieldGT(FieldFinishedAt, v))
-}
-
-// FinishedAtGTE applies the GTE predicate on the "finished_at" field.
-func FinishedAtGTE(v time.Time) predicate.Deployments {
-	return predicate.Deployments(sql.FieldGTE(FieldFinishedAt, v))
-}
-
-// FinishedAtLT applies the LT predicate on the "finished_at" field.
-func FinishedAtLT(v time.Time) predicate.Deployments {
-	return predicate.Deployments(sql.FieldLT(FieldFinishedAt, v))
-}
-
-// FinishedAtLTE applies the LTE predicate on the "finished_at" field.
-func FinishedAtLTE(v time.Time) predicate.Deployments {
-	return predicate.Deployments(sql.FieldLTE(FieldFinishedAt, v))
-}
-
-// FinishedAtIsNil applies the IsNil predicate on the "finished_at" field.
-func FinishedAtIsNil() predicate.Deployments {
-	return predicate.Deployments(sql.FieldIsNull(FieldFinishedAt))
-}
-
-// FinishedAtNotNil applies the NotNil predicate on the "finished_at" field.
-func FinishedAtNotNil() predicate.Deployments {
-	return predicate.Deployments(sql.FieldNotNull(FieldFinishedAt))
 }
 
 // HasAuthor applies the HasEdge predicate on the "author" edge.

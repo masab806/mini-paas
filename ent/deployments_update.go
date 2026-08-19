@@ -99,26 +99,6 @@ func (_u *DeploymentsUpdate) SetNillableCreatedAt(v *time.Time) *DeploymentsUpda
 	return _u
 }
 
-// SetFinishedAt sets the "finished_at" field.
-func (_u *DeploymentsUpdate) SetFinishedAt(v time.Time) *DeploymentsUpdate {
-	_u.mutation.SetFinishedAt(v)
-	return _u
-}
-
-// SetNillableFinishedAt sets the "finished_at" field if the given value is not nil.
-func (_u *DeploymentsUpdate) SetNillableFinishedAt(v *time.Time) *DeploymentsUpdate {
-	if v != nil {
-		_u.SetFinishedAt(*v)
-	}
-	return _u
-}
-
-// ClearFinishedAt clears the value of the "finished_at" field.
-func (_u *DeploymentsUpdate) ClearFinishedAt() *DeploymentsUpdate {
-	_u.mutation.ClearFinishedAt()
-	return _u
-}
-
 // SetAuthorID sets the "author" edge to the User entity by ID.
 func (_u *DeploymentsUpdate) SetAuthorID(id int) *DeploymentsUpdate {
 	_u.mutation.SetAuthorID(id)
@@ -212,12 +192,6 @@ func (_u *DeploymentsUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(deployments.FieldCreatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.FinishedAt(); ok {
-		_spec.SetField(deployments.FieldFinishedAt, field.TypeTime, value)
-	}
-	if _u.mutation.FinishedAtCleared() {
-		_spec.ClearField(deployments.FieldFinishedAt, field.TypeTime)
 	}
 	if _u.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -335,26 +309,6 @@ func (_u *DeploymentsUpdateOne) SetNillableCreatedAt(v *time.Time) *DeploymentsU
 	if v != nil {
 		_u.SetCreatedAt(*v)
 	}
-	return _u
-}
-
-// SetFinishedAt sets the "finished_at" field.
-func (_u *DeploymentsUpdateOne) SetFinishedAt(v time.Time) *DeploymentsUpdateOne {
-	_u.mutation.SetFinishedAt(v)
-	return _u
-}
-
-// SetNillableFinishedAt sets the "finished_at" field if the given value is not nil.
-func (_u *DeploymentsUpdateOne) SetNillableFinishedAt(v *time.Time) *DeploymentsUpdateOne {
-	if v != nil {
-		_u.SetFinishedAt(*v)
-	}
-	return _u
-}
-
-// ClearFinishedAt clears the value of the "finished_at" field.
-func (_u *DeploymentsUpdateOne) ClearFinishedAt() *DeploymentsUpdateOne {
-	_u.mutation.ClearFinishedAt()
 	return _u
 }
 
@@ -481,12 +435,6 @@ func (_u *DeploymentsUpdateOne) sqlSave(ctx context.Context) (_node *Deployments
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(deployments.FieldCreatedAt, field.TypeTime, value)
-	}
-	if value, ok := _u.mutation.FinishedAt(); ok {
-		_spec.SetField(deployments.FieldFinishedAt, field.TypeTime, value)
-	}
-	if _u.mutation.FinishedAtCleared() {
-		_spec.ClearField(deployments.FieldFinishedAt, field.TypeTime)
 	}
 	if _u.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{

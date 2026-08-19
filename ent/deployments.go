@@ -29,8 +29,6 @@ type Deployments struct {
 	Status string `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
-	// FinishedAt holds the value of the "finished_at" field.
-	FinishedAt *time.Time `json:"finished_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DeploymentsQuery when eager-loading is set.
 	Edges            DeploymentsEdges `json:"edges"`
@@ -65,7 +63,7 @@ func (*Deployments) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case deployments.FieldBranch, deployments.FieldImageTag, deployments.FieldRepoURL, deployments.FieldStatus:
 			values[i] = new(sql.NullString)
-		case deployments.FieldCreatedAt, deployments.FieldFinishedAt:
+		case deployments.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		case deployments.FieldID:
 			values[i] = new(uuid.UUID)
@@ -121,13 +119,6 @@ func (_m *Deployments) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				_m.CreatedAt = value.Time
-			}
-		case deployments.FieldFinishedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field finished_at", values[i])
-			} else if value.Valid {
-				_m.FinishedAt = new(time.Time)
-				*_m.FinishedAt = value.Time
 			}
 		case deployments.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -191,11 +182,6 @@ func (_m *Deployments) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	if v := _m.FinishedAt; v != nil {
-		builder.WriteString("finished_at=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
 	builder.WriteByte(')')
 	return builder.String()
 }

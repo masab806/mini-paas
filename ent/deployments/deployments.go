@@ -25,8 +25,6 @@ const (
 	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldFinishedAt holds the string denoting the finished_at field in the database.
-	FieldFinishedAt = "finished_at"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
 	// Table holds the table name of the deployments in the database.
@@ -48,7 +46,6 @@ var Columns = []string{
 	FieldRepoURL,
 	FieldStatus,
 	FieldCreatedAt,
-	FieldFinishedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "deployments"
@@ -118,11 +115,6 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
-}
-
-// ByFinishedAt orders the results by the finished_at field.
-func ByFinishedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFinishedAt, opts...).ToFunc()
 }
 
 // ByAuthorField orders the results by author field.

@@ -16,7 +16,6 @@ var (
 		{Name: "repo_url", Type: field.TypeString},
 		{Name: "status", Type: field.TypeString, Default: "QUEUED"},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "finished_at", Type: field.TypeTime, Nullable: true},
 		{Name: "user_deployments", Type: field.TypeInt},
 	}
 	// DeploymentsTable holds the schema information for the "deployments" table.
@@ -27,7 +26,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "deployments_users_Deployments",
-				Columns:    []*schema.Column{DeploymentsColumns[7]},
+				Columns:    []*schema.Column{DeploymentsColumns[6]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

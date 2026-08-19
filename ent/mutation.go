@@ -41,7 +41,6 @@ type DeploymentsMutation struct {
 	repo_url      *string
 	status        *string
 	created_at    *time.Time
-	finished_at   *time.Time
 	clearedFields map[string]struct{}
 	author        *int
 	clearedauthor bool
@@ -334,55 +333,6 @@ func (m *DeploymentsMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
-// SetFinishedAt sets the "finished_at" field.
-func (m *DeploymentsMutation) SetFinishedAt(t time.Time) {
-	m.finished_at = &t
-}
-
-// FinishedAt returns the value of the "finished_at" field in the mutation.
-func (m *DeploymentsMutation) FinishedAt() (r time.Time, exists bool) {
-	v := m.finished_at
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFinishedAt returns the old "finished_at" field's value of the Deployments entity.
-// If the Deployments object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DeploymentsMutation) OldFinishedAt(ctx context.Context) (v *time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFinishedAt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFinishedAt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFinishedAt: %w", err)
-	}
-	return oldValue.FinishedAt, nil
-}
-
-// ClearFinishedAt clears the value of the "finished_at" field.
-func (m *DeploymentsMutation) ClearFinishedAt() {
-	m.finished_at = nil
-	m.clearedFields[deployments.FieldFinishedAt] = struct{}{}
-}
-
-// FinishedAtCleared returns if the "finished_at" field was cleared in this mutation.
-func (m *DeploymentsMutation) FinishedAtCleared() bool {
-	_, ok := m.clearedFields[deployments.FieldFinishedAt]
-	return ok
-}
-
-// ResetFinishedAt resets all changes to the "finished_at" field.
-func (m *DeploymentsMutation) ResetFinishedAt() {
-	m.finished_at = nil
-	delete(m.clearedFields, deployments.FieldFinishedAt)
-}
-
 // SetAuthorID sets the "author" edge to the User entity by id.
 func (m *DeploymentsMutation) SetAuthorID(id int) {
 	m.author = &id
@@ -456,7 +406,7 @@ func (m *DeploymentsMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DeploymentsMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 5)
 	if m.branch != nil {
 		fields = append(fields, deployments.FieldBranch)
 	}
@@ -471,9 +421,6 @@ func (m *DeploymentsMutation) Fields() []string {
 	}
 	if m.created_at != nil {
 		fields = append(fields, deployments.FieldCreatedAt)
-	}
-	if m.finished_at != nil {
-		fields = append(fields, deployments.FieldFinishedAt)
 	}
 	return fields
 }
@@ -493,8 +440,6 @@ func (m *DeploymentsMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case deployments.FieldCreatedAt:
 		return m.CreatedAt()
-	case deployments.FieldFinishedAt:
-		return m.FinishedAt()
 	}
 	return nil, false
 }
@@ -514,8 +459,6 @@ func (m *DeploymentsMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldStatus(ctx)
 	case deployments.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case deployments.FieldFinishedAt:
-		return m.OldFinishedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Deployments field %s", name)
 }
@@ -560,13 +503,6 @@ func (m *DeploymentsMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCreatedAt(v)
 		return nil
-	case deployments.FieldFinishedAt:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetFinishedAt(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Deployments field %s", name)
 }
@@ -596,11 +532,7 @@ func (m *DeploymentsMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *DeploymentsMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(deployments.FieldFinishedAt) {
-		fields = append(fields, deployments.FieldFinishedAt)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -613,11 +545,6 @@ func (m *DeploymentsMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *DeploymentsMutation) ClearField(name string) error {
-	switch name {
-	case deployments.FieldFinishedAt:
-		m.ClearFinishedAt()
-		return nil
-	}
 	return fmt.Errorf("unknown Deployments nullable field %s", name)
 }
 
@@ -639,9 +566,6 @@ func (m *DeploymentsMutation) ResetField(name string) error {
 		return nil
 	case deployments.FieldCreatedAt:
 		m.ResetCreatedAt()
-		return nil
-	case deployments.FieldFinishedAt:
-		m.ResetFinishedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Deployments field %s", name)
