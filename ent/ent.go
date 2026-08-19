@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"mini-paas/ent/deployments"
 	"mini-paas/ent/user"
 	"reflect"
 	"sync"
@@ -73,7 +74,8 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			user.Table: user.ValidColumn,
+			deployments.Table: deployments.ValidColumn,
+			user.Table:        user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

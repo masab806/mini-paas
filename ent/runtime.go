@@ -3,15 +3,44 @@
 package ent
 
 import (
+	"mini-paas/ent/deployments"
 	"mini-paas/ent/schema"
 	"mini-paas/ent/user"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	deploymentsFields := schema.Deployments{}.Fields()
+	_ = deploymentsFields
+	// deploymentsDescBranch is the schema descriptor for branch field.
+	deploymentsDescBranch := deploymentsFields[1].Descriptor()
+	// deployments.DefaultBranch holds the default value on creation for the branch field.
+	deployments.DefaultBranch = deploymentsDescBranch.Default.(string)
+	// deploymentsDescImageTag is the schema descriptor for image_tag field.
+	deploymentsDescImageTag := deploymentsFields[2].Descriptor()
+	// deployments.ImageTagValidator is a validator for the "image_tag" field. It is called by the builders before save.
+	deployments.ImageTagValidator = deploymentsDescImageTag.Validators[0].(func(string) error)
+	// deploymentsDescRepoURL is the schema descriptor for repo_url field.
+	deploymentsDescRepoURL := deploymentsFields[3].Descriptor()
+	// deployments.RepoURLValidator is a validator for the "repo_url" field. It is called by the builders before save.
+	deployments.RepoURLValidator = deploymentsDescRepoURL.Validators[0].(func(string) error)
+	// deploymentsDescStatus is the schema descriptor for status field.
+	deploymentsDescStatus := deploymentsFields[4].Descriptor()
+	// deployments.DefaultStatus holds the default value on creation for the status field.
+	deployments.DefaultStatus = deploymentsDescStatus.Default.(string)
+	// deploymentsDescCreatedAt is the schema descriptor for created_at field.
+	deploymentsDescCreatedAt := deploymentsFields[5].Descriptor()
+	// deployments.DefaultCreatedAt holds the default value on creation for the created_at field.
+	deployments.DefaultCreatedAt = deploymentsDescCreatedAt.Default.(func() time.Time)
+	// deploymentsDescID is the schema descriptor for id field.
+	deploymentsDescID := deploymentsFields[0].Descriptor()
+	// deployments.DefaultID holds the default value on creation for the id field.
+	deployments.DefaultID = deploymentsDescID.Default.(func() uuid.UUID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.

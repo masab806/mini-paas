@@ -6,5 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Deployments is the predicate function for deployments builders.
+type Deployments func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

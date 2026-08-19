@@ -30,7 +30,8 @@ func main(){
 		log.Fatal(err)
 	}
 
-	deployService := services.NewDeployService(client)
+	deploymentRepo := repositories.NewDeploymentRepository(client)
+	deployService := services.NewDeployService(client, deploymentRepo)
 	deployHandler := handlers.NewDeployHandler(deployService)
 
 	userRepo := repositories.NewUserRepository(client)

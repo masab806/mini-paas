@@ -5,20 +5,25 @@ import (
 	"errors"
 	"fmt"
 	"mini-paas/ent"
+	"mini-paas/internals/repositories"
+	"mini-paas/internals/utils"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/google/uuid"
 )
 
 type DeployService struct {
 	client *ent.Client
+	repo repositories.DeploymentRepository
 }
 
-func NewDeployService(client *ent.Client) *DeployService {
+func NewDeployService(client *ent.Client, repo repositories.DeploymentRepository) *DeployService {
 	return &DeployService{
 		client: client,
+		repo: repo,
 	}
 }
 
@@ -70,13 +75,11 @@ func (s *DeployService) BuildDockerFile(ctx context.Context, projectPath string,
 		return fmt.Errorf("docker build failed: %w\n%s", err, output)
 	}
 
-	fmt.Println(string(output))
-
 	return nil
 
 }
 
-func (s *DeployService) RunContainer(ctx context.Context, port string, containerName string, imageName string) error {
+func (s *DeployService) RunContainer(ctx context.Context, port string, containerName string, imageName string) (string, error) {
 	cmd := exec.CommandContext(
 		ctx,
 		"docker",
@@ -92,22 +95,24 @@ func (s *DeployService) RunContainer(ctx context.Context, port string, container
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	fmt.Println(string(output))
 
-	return nil
+	containerID := strings.TrimSpace(string(output))
+
+	return containerID, nil
 
 }
 
-func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, branch string, imageTag string, framework string, name string, port string) (string, error) {
+func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, branch string, imageTag string, framework string, name string, port string, userId int) (*ent.Deployments, string, error) {
 	baseDir := "/mini-pass/deployments/"
 
 	err := os.MkdirAll(baseDir, 0755)
 
 	if err != nil {
-		return "", errors.New("Invalid Path")
+		return nil, "", errors.New("Invalid Path")
 	}
 
 	id := uuid.NewString()
@@ -119,7 +124,7 @@ func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, bra
 	gitPath, gitErr := exec.LookPath("git")
 
 	if err != nil {
-		return "", gitErr
+		return nil, "", gitErr
 	}
 
 	fmt.Println(gitPath)
@@ -129,21 +134,29 @@ func (s *DeployService) CloneRepository(ctx context.Context, repoURL string, bra
 	if err != nil {
 		fmt.Printf("git clone failed: %v\n", err)
 		fmt.Printf("output:\n%s\n", output)
-		return "", err
+		return nil, "", err
 	}
 
 	err = s.BuildDockerFile(ctx, path, imageTag, framework)
 
-	containerErr := s.RunContainer(ctx, port, name, imageTag)
+	containerId, containerErr := s.RunContainer(ctx, port, name, imageTag)
+
+	dockerStatus, statusErr := utils.GetContainerStatus(ctx, containerId)
+
+	if statusErr != nil {
+		return nil, "", statusErr
+	}
+
+	deployment, err := s.repo.CreateDeployment(ctx, branch, imageTag, repoURL, dockerStatus, userId)
 
 	if containerErr != nil {
-		return "", containerErr
+		return nil, "", containerErr
 	}
 
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 
-	return path, nil
+	return deployment, path, nil
 
 }

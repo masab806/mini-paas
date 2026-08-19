@@ -8,6 +8,31 @@ import (
 )
 
 var (
+	// DeploymentsColumns holds the columns for the "deployments" table.
+	DeploymentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "branch", Type: field.TypeString, Default: "main"},
+		{Name: "image_tag", Type: field.TypeString},
+		{Name: "repo_url", Type: field.TypeString},
+		{Name: "status", Type: field.TypeString, Default: "QUEUED"},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "finished_at", Type: field.TypeTime, Nullable: true},
+		{Name: "user_deployments", Type: field.TypeInt},
+	}
+	// DeploymentsTable holds the schema information for the "deployments" table.
+	DeploymentsTable = &schema.Table{
+		Name:       "deployments",
+		Columns:    DeploymentsColumns,
+		PrimaryKey: []*schema.Column{DeploymentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "deployments_users_Deployments",
+				Columns:    []*schema.Column{DeploymentsColumns[7]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -24,9 +49,11 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		DeploymentsTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	DeploymentsTable.ForeignKeys[0].RefTable = UsersTable
 }

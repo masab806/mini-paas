@@ -8,6 +8,18 @@ import (
 	"mini-paas/ent"
 )
 
+// The DeploymentsFunc type is an adapter to allow the use of ordinary
+// function as Deployments mutator.
+type DeploymentsFunc func(context.Context, *ent.DeploymentsMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DeploymentsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DeploymentsMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DeploymentsMutation", m)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

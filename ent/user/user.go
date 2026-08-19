@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -21,8 +22,17 @@ const (
 	FieldPassword = "password"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// EdgeDeployments holds the string denoting the deployments edge name in mutations.
+	EdgeDeployments = "Deployments"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// DeploymentsTable is the table that holds the Deployments relation/edge.
+	DeploymentsTable = "deployments"
+	// DeploymentsInverseTable is the table name for the Deployments entity.
+	// It exists in this package in order to avoid circular dependency with the "deployments" package.
+	DeploymentsInverseTable = "deployments"
+	// DeploymentsColumn is the table column denoting the Deployments relation/edge.
+	DeploymentsColumn = "user_deployments"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -81,4 +91,25 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByDeploymentsCount orders the results by Deployments count.
+func ByDeploymentsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDeploymentsStep(), opts...)
+	}
+}
+
+// ByDeployments orders the results by Deployments terms.
+func ByDeployments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDeploymentsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newDeploymentsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DeploymentsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DeploymentsTable, DeploymentsColumn),
+	)
 }

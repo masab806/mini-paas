@@ -6,11 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"mini-paas/ent/deployments"
 	"mini-paas/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -50,6 +52,21 @@ func (_c *UserCreate) SetNillableCreatedAt(v *time.Time) *UserCreate {
 		_c.SetCreatedAt(*v)
 	}
 	return _c
+}
+
+// AddDeploymentIDs adds the "Deployments" edge to the Deployments entity by IDs.
+func (_c *UserCreate) AddDeploymentIDs(ids ...uuid.UUID) *UserCreate {
+	_c.mutation.AddDeploymentIDs(ids...)
+	return _c
+}
+
+// AddDeployments adds the "Deployments" edges to the Deployments entity.
+func (_c *UserCreate) AddDeployments(v ...*Deployments) *UserCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddDeploymentIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -163,6 +180,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if nodes := _c.mutation.DeploymentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DeploymentsTable,
+			Columns: []string{user.DeploymentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deployments.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

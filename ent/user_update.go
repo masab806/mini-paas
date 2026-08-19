@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"mini-paas/ent/deployments"
 	"mini-paas/ent/predicate"
 	"mini-paas/ent/user"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -84,9 +86,45 @@ func (_u *UserUpdate) SetNillableCreatedAt(v *time.Time) *UserUpdate {
 	return _u
 }
 
+// AddDeploymentIDs adds the "Deployments" edge to the Deployments entity by IDs.
+func (_u *UserUpdate) AddDeploymentIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.AddDeploymentIDs(ids...)
+	return _u
+}
+
+// AddDeployments adds the "Deployments" edges to the Deployments entity.
+func (_u *UserUpdate) AddDeployments(v ...*Deployments) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDeploymentIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdate) Mutation() *UserMutation {
 	return _u.mutation
+}
+
+// ClearDeployments clears all "Deployments" edges to the Deployments entity.
+func (_u *UserUpdate) ClearDeployments() *UserUpdate {
+	_u.mutation.ClearDeployments()
+	return _u
+}
+
+// RemoveDeploymentIDs removes the "Deployments" edge to Deployments entities by IDs.
+func (_u *UserUpdate) RemoveDeploymentIDs(ids ...uuid.UUID) *UserUpdate {
+	_u.mutation.RemoveDeploymentIDs(ids...)
+	return _u
+}
+
+// RemoveDeployments removes "Deployments" edges to Deployments entities.
+func (_u *UserUpdate) RemoveDeployments(v ...*Deployments) *UserUpdate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDeploymentIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -159,6 +197,51 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeploymentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DeploymentsTable,
+			Columns: []string{user.DeploymentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deployments.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDeploymentsIDs(); len(nodes) > 0 && !_u.mutation.DeploymentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DeploymentsTable,
+			Columns: []string{user.DeploymentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deployments.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DeploymentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DeploymentsTable,
+			Columns: []string{user.DeploymentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deployments.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -236,9 +319,45 @@ func (_u *UserUpdateOne) SetNillableCreatedAt(v *time.Time) *UserUpdateOne {
 	return _u
 }
 
+// AddDeploymentIDs adds the "Deployments" edge to the Deployments entity by IDs.
+func (_u *UserUpdateOne) AddDeploymentIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.AddDeploymentIDs(ids...)
+	return _u
+}
+
+// AddDeployments adds the "Deployments" edges to the Deployments entity.
+func (_u *UserUpdateOne) AddDeployments(v ...*Deployments) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDeploymentIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdateOne) Mutation() *UserMutation {
 	return _u.mutation
+}
+
+// ClearDeployments clears all "Deployments" edges to the Deployments entity.
+func (_u *UserUpdateOne) ClearDeployments() *UserUpdateOne {
+	_u.mutation.ClearDeployments()
+	return _u
+}
+
+// RemoveDeploymentIDs removes the "Deployments" edge to Deployments entities by IDs.
+func (_u *UserUpdateOne) RemoveDeploymentIDs(ids ...uuid.UUID) *UserUpdateOne {
+	_u.mutation.RemoveDeploymentIDs(ids...)
+	return _u
+}
+
+// RemoveDeployments removes "Deployments" edges to Deployments entities.
+func (_u *UserUpdateOne) RemoveDeployments(v ...*Deployments) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDeploymentIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -341,6 +460,51 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeploymentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DeploymentsTable,
+			Columns: []string{user.DeploymentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deployments.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDeploymentsIDs(); len(nodes) > 0 && !_u.mutation.DeploymentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DeploymentsTable,
+			Columns: []string{user.DeploymentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deployments.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DeploymentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DeploymentsTable,
+			Columns: []string{user.DeploymentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deployments.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: _u.config}
 	_spec.Assign = _node.assignValues
