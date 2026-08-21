@@ -34,12 +34,16 @@ func main(){
 	deployService := services.NewDeployService(client, deploymentRepo)
 	deployHandler := handlers.NewDeployHandler(deployService)
 
+	logService := services.NewLogService()
+	logHandler := handlers.NewLogHandler(logService)
+
 	userRepo := repositories.NewUserRepository(client)
 	userService := services.NewUserService(userRepo)
 	userHandler := handlers.NewUserHandler(userService)
 
 	routes.DeployRoutes(r, deployHandler)
 	routes.UserRoutes(r, userHandler)
+	routes.LogRoutes(r, logHandler)
 
 	log.Fatal(r.Run(":8000"))
 
