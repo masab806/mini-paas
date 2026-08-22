@@ -37,6 +37,9 @@ func main(){
 	logService := services.NewLogService()
 	logHandler := handlers.NewLogHandler(logService)
 
+	containerService := services.NewContainerService()
+	containerHandler := handlers.NewContainerHandler(containerService)
+
 	userRepo := repositories.NewUserRepository(client)
 	userService := services.NewUserService(userRepo)
 	userHandler := handlers.NewUserHandler(userService)
@@ -44,6 +47,7 @@ func main(){
 	routes.DeployRoutes(r, deployHandler)
 	routes.UserRoutes(r, userHandler)
 	routes.LogRoutes(r, logHandler)
+	routes.ContainerRoutes(r, containerHandler)
 
 	log.Fatal(r.Run(":8000"))
 
