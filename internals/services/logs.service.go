@@ -2,9 +2,11 @@ package services
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"os/exec"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 type LogService struct{}
@@ -50,4 +52,30 @@ func (s *LogService) GetContainerLogs(ctx context.Context, containerName string,
 	finalResult := SimpleSanitize(string(output))
 
 	return finalResult, nil
+}
+
+func (s *LogService) StreamContainerLogs(ctx context.Context, containerName string, lineNo string) (io.ReadCloser, error) {
+	cmd := exec.CommandContext(
+		ctx,
+		"docker",
+		"logs",
+		"-f",
+		"--tail",
+		lineNo,
+		containerName,
+	)
+
+	stdout, err := cmd.StdoutPipe()
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to create a pipeline: %w", err)
+	}
+
+	cmd.Stderr = cmd.Stdout
+
+	if err := cmd.Start(); err != nil {
+		return nil, fmt.Errorf("failed to start log command: %w", err)
+	}
+
+	return stdout, nil
 }

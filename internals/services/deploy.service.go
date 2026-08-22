@@ -17,13 +17,13 @@ import (
 
 type DeployService struct {
 	client *ent.Client
-	repo repositories.DeploymentRepository
+	repo   repositories.DeploymentRepository
 }
 
 func NewDeployService(client *ent.Client, repo repositories.DeploymentRepository) *DeployService {
 	return &DeployService{
 		client: client,
-		repo: repo,
+		repo:   repo,
 	}
 }
 
@@ -84,13 +84,11 @@ func (s *DeployService) RunContainer(ctx context.Context, port string, container
 		ctx,
 		"docker",
 		"run",
-		"-d",
-		"--name", containerName, 
-		"-p", port, 
+		"-d", 
+		"--name", containerName,
+		"-p", port,
 		imageName,
 	)
-
-
 
 	output, err := cmd.CombinedOutput()
 
