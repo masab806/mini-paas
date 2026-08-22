@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"bufio"
+	"encoding/json"
 	"io"
 	"mini-paas/internals/dto"
 	"mini-paas/internals/services"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,7 +58,6 @@ func (h *LogHandler) StreamLogs(c *gin.Context) {
 	}
 	defer streamReader.Close()
 
-	// Use event-stream so Postman & Browsers render lines as they arrive
 	c.Header("Content-Type", "text/event-stream")
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")
@@ -73,8 +74,14 @@ func (h *LogHandler) StreamLogs(c *gin.Context) {
 				return true
 			}
 
-			// Format as SSE data line to force Postman to display instantly
-			c.Writer.WriteString("data: " + line + "\n\n")
+			logEntry, _ := json.Marshal(dto.LogMessage{
+				Timestamp: time.Now().UTC().Format(time.RFC3339),
+				Log: line,
+				Source: "stdout",
+			})
+			
+
+			c.Writer.WriteString("data: " + string(logEntry) + "\n\n")
 
 			if flusher, ok := c.Writer.(http.Flusher); ok {
 				flusher.Flush()
