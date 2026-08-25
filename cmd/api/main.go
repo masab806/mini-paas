@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"mini-paas/internals/config"
 	"mini-paas/internals/database"
@@ -37,6 +38,13 @@ func main(){
 	logService := services.NewLogService()
 	logHandler := handlers.NewLogHandler(logService)
 
+	AIService, err := services.NewAIService(context.Background(), os.Getenv("GEMINI_KEY"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	AIHandler := handlers.NewAIHandler(AIService, logService)
+
 	containerService := services.NewContainerService()
 	containerHandler := handlers.NewContainerHandler(containerService)
 
@@ -48,6 +56,7 @@ func main(){
 	routes.UserRoutes(r, userHandler)
 	routes.LogRoutes(r, logHandler)
 	routes.ContainerRoutes(r, containerHandler)
+	routes.AIRoutes(r, AIHandler)
 
 	log.Fatal(r.Run(":8000"))
 
