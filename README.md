@@ -1,4 +1,4 @@
-# 🚀 SentinelPaaS
+# 🚀 Self-Orchestrated Mini-PaaS with Event-Driven AIOp
 
 **Self-Orchastrated Mini-Paas** is a self-hosted, event-driven Mini-PaaS (Platform as a Service) built in Go. It automates container lifecycle management using the Docker Engine API, dynamically routes domain traffic via an Nginx reverse proxy, and features an automated **AIOps diagnostic engine**.
 
