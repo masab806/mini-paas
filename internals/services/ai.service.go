@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"mini-paas/internals/repositories"
 
 	"google.golang.org/genai"
 )
@@ -11,6 +12,8 @@ import (
 type AIService struct {
 	apiKey string
 	client *genai.Client
+	repo repositories.UserRepository
+	mailService *MailService
 }
 
 type CrashAnalysisResponse struct {
@@ -20,7 +23,7 @@ type CrashAnalysisResponse struct {
 	Severity  string `json:"severity"`
 }
 
-func NewAIService(ctx context.Context, apiKey string) (*AIService, error) {
+func NewAIService(ctx context.Context, apiKey string, repo repositories.UserRepository, mailService *MailService) (*AIService, error) {
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		APIKey: apiKey,
 	})
@@ -32,10 +35,12 @@ func NewAIService(ctx context.Context, apiKey string) (*AIService, error) {
 	return &AIService{
 		apiKey: apiKey,
 		client: client,
+		repo: repo,
+		mailService: mailService,
 	}, nil
 }
 
-func (s *AIService) AnalyzeContainerLogs(ctx context.Context, logs string) (*CrashAnalysisResponse, error) {
+func (s *AIService) AnalyzeContainerLogs(ctx context.Context, logs string, email string) (*CrashAnalysisResponse, error) {
 	var promptTemplate = `You are an expert AI DevOps Engineer and System Reliability Specialist. Analyze the provided container application crash logs or deployment stack traces and output a JSON object strictly matching the following schema.
 
 ### JSON Output Schema:
@@ -54,6 +59,12 @@ func (s *AIService) AnalyzeContainerLogs(ctx context.Context, logs string) (*Cra
 
 ### Logs:
 %s`
+
+	user, userErr := s.repo.GetByEmail(ctx, email)
+
+	if userErr != nil {
+		return nil, userErr
+	}
 
 	prompt := fmt.Sprintf(promptTemplate, logs)
 
@@ -103,6 +114,35 @@ func (s *AIService) AnalyzeContainerLogs(ctx context.Context, logs string) (*Cra
 
 	if err := json.Unmarshal([]byte(resp.Text()), &analysis); err != nil {
 		return nil, fmt.Errorf("failed to structure data in JSON: %s", err)
+	}
+
+	messageText := fmt.Sprintf(`
+The following crash occurred in your container.
+
+Summary:
+%s
+
+Diagnosis:
+%s
+
+Solution:
+%s
+
+Severity:
+%s
+`,
+		analysis.Summary,
+		analysis.Diagonsis,
+		analysis.Solution,
+		analysis.Severity,
+	)
+
+	// Send email
+	if s.mailService != nil {
+		s.mailService.SendMail(
+			user.Email,
+			messageText,
+		)
 	}
 
 	return &analysis, nil

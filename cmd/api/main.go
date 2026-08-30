@@ -38,12 +38,7 @@ func main(){
 	logService := services.NewLogService()
 	logHandler := handlers.NewLogHandler(logService)
 
-	AIService, err := services.NewAIService(context.Background(), os.Getenv("GEMINI_KEY"))
-	if err != nil {
-		log.Fatal(err)
-	}
 	
-	AIHandler := handlers.NewAIHandler(AIService, logService)
 
 	containerService := services.NewContainerService()
 	containerHandler := handlers.NewContainerHandler(containerService)
@@ -51,6 +46,15 @@ func main(){
 	userRepo := repositories.NewUserRepository(client)
 	userService := services.NewUserService(userRepo)
 	userHandler := handlers.NewUserHandler(userService)
+
+	mailService := services.NewMailService()
+
+	AIService, err := services.NewAIService(context.Background(), os.Getenv("GEMINI_KEY"), userRepo, mailService)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	AIHandler := handlers.NewAIHandler(AIService, logService)
 
 	routes.DeployRoutes(r, deployHandler)
 	routes.UserRoutes(r, userHandler)

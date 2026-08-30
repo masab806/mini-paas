@@ -39,7 +39,7 @@ func (h *AIHandler) AnalyzeLogs(c *gin.Context) {
 		})
 	}
 
-	result, analyzeErr := h.AiService.AnalyzeContainerLogs(c.Request.Context(), logs)
+	result, analyzeErr := h.AiService.AnalyzeContainerLogs(c.Request.Context(), logs, "")
 
 	if analyzeErr != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
