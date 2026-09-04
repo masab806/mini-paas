@@ -21,6 +21,8 @@ const (
 	FieldImageTag = "image_tag"
 	// FieldRepoURL holds the string denoting the repo_url field in the database.
 	FieldRepoURL = "repo_url"
+	// FieldDomain holds the string denoting the domain field in the database.
+	FieldDomain = "domain"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -44,6 +46,7 @@ var Columns = []string{
 	FieldBranch,
 	FieldImageTag,
 	FieldRepoURL,
+	FieldDomain,
 	FieldStatus,
 	FieldCreatedAt,
 }
@@ -105,6 +108,11 @@ func ByImageTag(opts ...sql.OrderTermOption) OrderOption {
 // ByRepoURL orders the results by the repo_url field.
 func ByRepoURL(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRepoURL, opts...).ToFunc()
+}
+
+// ByDomain orders the results by the Domain field.
+func ByDomain(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDomain, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

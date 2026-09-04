@@ -30,11 +30,11 @@ func init() {
 	// deployments.RepoURLValidator is a validator for the "repo_url" field. It is called by the builders before save.
 	deployments.RepoURLValidator = deploymentsDescRepoURL.Validators[0].(func(string) error)
 	// deploymentsDescStatus is the schema descriptor for status field.
-	deploymentsDescStatus := deploymentsFields[4].Descriptor()
+	deploymentsDescStatus := deploymentsFields[5].Descriptor()
 	// deployments.DefaultStatus holds the default value on creation for the status field.
 	deployments.DefaultStatus = deploymentsDescStatus.Default.(string)
 	// deploymentsDescCreatedAt is the schema descriptor for created_at field.
-	deploymentsDescCreatedAt := deploymentsFields[5].Descriptor()
+	deploymentsDescCreatedAt := deploymentsFields[6].Descriptor()
 	// deployments.DefaultCreatedAt holds the default value on creation for the created_at field.
 	deployments.DefaultCreatedAt = deploymentsDescCreatedAt.Default.(func() time.Time)
 	// deploymentsDescID is the schema descriptor for id field.

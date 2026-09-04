@@ -25,6 +25,8 @@ type Deployments struct {
 	ImageTag string `json:"image_tag,omitempty"`
 	// RepoURL holds the value of the "repo_url" field.
 	RepoURL string `json:"repo_url,omitempty"`
+	// Domain holds the value of the "Domain" field.
+	Domain string `json:"Domain,omitempty"`
 	// Status holds the value of the "status" field.
 	Status string `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -61,7 +63,7 @@ func (*Deployments) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case deployments.FieldBranch, deployments.FieldImageTag, deployments.FieldRepoURL, deployments.FieldStatus:
+		case deployments.FieldBranch, deployments.FieldImageTag, deployments.FieldRepoURL, deployments.FieldDomain, deployments.FieldStatus:
 			values[i] = new(sql.NullString)
 		case deployments.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -107,6 +109,12 @@ func (_m *Deployments) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field repo_url", values[i])
 			} else if value.Valid {
 				_m.RepoURL = value.String
+			}
+		case deployments.FieldDomain:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field Domain", values[i])
+			} else if value.Valid {
+				_m.Domain = value.String
 			}
 		case deployments.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -176,6 +184,9 @@ func (_m *Deployments) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("repo_url=")
 	builder.WriteString(_m.RepoURL)
+	builder.WriteString(", ")
+	builder.WriteString("Domain=")
+	builder.WriteString(_m.Domain)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(_m.Status)

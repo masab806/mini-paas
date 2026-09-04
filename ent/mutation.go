@@ -39,6 +39,7 @@ type DeploymentsMutation struct {
 	branch        *string
 	image_tag     *string
 	repo_url      *string
+	_Domain       *string
 	status        *string
 	created_at    *time.Time
 	clearedFields map[string]struct{}
@@ -261,6 +262,55 @@ func (m *DeploymentsMutation) ResetRepoURL() {
 	m.repo_url = nil
 }
 
+// SetDomain sets the "Domain" field.
+func (m *DeploymentsMutation) SetDomain(s string) {
+	m._Domain = &s
+}
+
+// Domain returns the value of the "Domain" field in the mutation.
+func (m *DeploymentsMutation) Domain() (r string, exists bool) {
+	v := m._Domain
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDomain returns the old "Domain" field's value of the Deployments entity.
+// If the Deployments object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeploymentsMutation) OldDomain(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDomain is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDomain requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDomain: %w", err)
+	}
+	return oldValue.Domain, nil
+}
+
+// ClearDomain clears the value of the "Domain" field.
+func (m *DeploymentsMutation) ClearDomain() {
+	m._Domain = nil
+	m.clearedFields[deployments.FieldDomain] = struct{}{}
+}
+
+// DomainCleared returns if the "Domain" field was cleared in this mutation.
+func (m *DeploymentsMutation) DomainCleared() bool {
+	_, ok := m.clearedFields[deployments.FieldDomain]
+	return ok
+}
+
+// ResetDomain resets all changes to the "Domain" field.
+func (m *DeploymentsMutation) ResetDomain() {
+	m._Domain = nil
+	delete(m.clearedFields, deployments.FieldDomain)
+}
+
 // SetStatus sets the "status" field.
 func (m *DeploymentsMutation) SetStatus(s string) {
 	m.status = &s
@@ -406,7 +456,7 @@ func (m *DeploymentsMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DeploymentsMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.branch != nil {
 		fields = append(fields, deployments.FieldBranch)
 	}
@@ -415,6 +465,9 @@ func (m *DeploymentsMutation) Fields() []string {
 	}
 	if m.repo_url != nil {
 		fields = append(fields, deployments.FieldRepoURL)
+	}
+	if m._Domain != nil {
+		fields = append(fields, deployments.FieldDomain)
 	}
 	if m.status != nil {
 		fields = append(fields, deployments.FieldStatus)
@@ -436,6 +489,8 @@ func (m *DeploymentsMutation) Field(name string) (ent.Value, bool) {
 		return m.ImageTag()
 	case deployments.FieldRepoURL:
 		return m.RepoURL()
+	case deployments.FieldDomain:
+		return m.Domain()
 	case deployments.FieldStatus:
 		return m.Status()
 	case deployments.FieldCreatedAt:
@@ -455,6 +510,8 @@ func (m *DeploymentsMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldImageTag(ctx)
 	case deployments.FieldRepoURL:
 		return m.OldRepoURL(ctx)
+	case deployments.FieldDomain:
+		return m.OldDomain(ctx)
 	case deployments.FieldStatus:
 		return m.OldStatus(ctx)
 	case deployments.FieldCreatedAt:
@@ -488,6 +545,13 @@ func (m *DeploymentsMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetRepoURL(v)
+		return nil
+	case deployments.FieldDomain:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDomain(v)
 		return nil
 	case deployments.FieldStatus:
 		v, ok := value.(string)
@@ -532,7 +596,11 @@ func (m *DeploymentsMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *DeploymentsMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(deployments.FieldDomain) {
+		fields = append(fields, deployments.FieldDomain)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -545,6 +613,11 @@ func (m *DeploymentsMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *DeploymentsMutation) ClearField(name string) error {
+	switch name {
+	case deployments.FieldDomain:
+		m.ClearDomain()
+		return nil
+	}
 	return fmt.Errorf("unknown Deployments nullable field %s", name)
 }
 
@@ -560,6 +633,9 @@ func (m *DeploymentsMutation) ResetField(name string) error {
 		return nil
 	case deployments.FieldRepoURL:
 		m.ResetRepoURL()
+		return nil
+	case deployments.FieldDomain:
+		m.ResetDomain()
 		return nil
 	case deployments.FieldStatus:
 		m.ResetStatus()

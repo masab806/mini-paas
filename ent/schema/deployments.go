@@ -29,6 +29,9 @@ func (Deployments) Fields() []ent.Field {
 		field.String("repo_url").
 			NotEmpty(),
 
+		field.String("Domain").
+			Optional(),
+
 		field.String("status").
 			Default("QUEUED"),
 

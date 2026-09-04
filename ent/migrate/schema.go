@@ -14,6 +14,7 @@ var (
 		{Name: "branch", Type: field.TypeString, Default: "main"},
 		{Name: "image_tag", Type: field.TypeString},
 		{Name: "repo_url", Type: field.TypeString},
+		{Name: "domain", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeString, Default: "QUEUED"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "user_deployments", Type: field.TypeInt},
@@ -26,7 +27,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "deployments_users_Deployments",
-				Columns:    []*schema.Column{DeploymentsColumns[6]},
+				Columns:    []*schema.Column{DeploymentsColumns[7]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

@@ -1,21 +1,27 @@
 package utils
 
-import "net"
+import (
+	"fmt"
+	"net"
+)
 
 func GetFreePort() (int, error) {
-	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1")
+
+	listener, err := net.Listen(
+		"tcp",
+		"127.0.0.1:0",
+	)
 
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf(
+			"failed to find free port: %w",
+			err,
+		)
 	}
 
-	l, err := net.ListenTCP("tcp", addr)
+	defer listener.Close()
 
-	if err != nil {
-		return  0, err
-	}
+	addr := listener.Addr().(*net.TCPAddr)
 
-	defer l.Close()
-
-	return l.Addr().(*net.TCPAddr).Port, nil
+	return addr.Port, nil
 }

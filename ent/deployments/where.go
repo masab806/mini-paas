@@ -71,6 +71,11 @@ func RepoURL(v string) predicate.Deployments {
 	return predicate.Deployments(sql.FieldEQ(FieldRepoURL, v))
 }
 
+// Domain applies equality check predicate on the "Domain" field. It's identical to DomainEQ.
+func Domain(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldEQ(FieldDomain, v))
+}
+
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
 func Status(v string) predicate.Deployments {
 	return predicate.Deployments(sql.FieldEQ(FieldStatus, v))
@@ -274,6 +279,81 @@ func RepoURLEqualFold(v string) predicate.Deployments {
 // RepoURLContainsFold applies the ContainsFold predicate on the "repo_url" field.
 func RepoURLContainsFold(v string) predicate.Deployments {
 	return predicate.Deployments(sql.FieldContainsFold(FieldRepoURL, v))
+}
+
+// DomainEQ applies the EQ predicate on the "Domain" field.
+func DomainEQ(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldEQ(FieldDomain, v))
+}
+
+// DomainNEQ applies the NEQ predicate on the "Domain" field.
+func DomainNEQ(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldNEQ(FieldDomain, v))
+}
+
+// DomainIn applies the In predicate on the "Domain" field.
+func DomainIn(vs ...string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldIn(FieldDomain, vs...))
+}
+
+// DomainNotIn applies the NotIn predicate on the "Domain" field.
+func DomainNotIn(vs ...string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldNotIn(FieldDomain, vs...))
+}
+
+// DomainGT applies the GT predicate on the "Domain" field.
+func DomainGT(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldGT(FieldDomain, v))
+}
+
+// DomainGTE applies the GTE predicate on the "Domain" field.
+func DomainGTE(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldGTE(FieldDomain, v))
+}
+
+// DomainLT applies the LT predicate on the "Domain" field.
+func DomainLT(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldLT(FieldDomain, v))
+}
+
+// DomainLTE applies the LTE predicate on the "Domain" field.
+func DomainLTE(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldLTE(FieldDomain, v))
+}
+
+// DomainContains applies the Contains predicate on the "Domain" field.
+func DomainContains(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldContains(FieldDomain, v))
+}
+
+// DomainHasPrefix applies the HasPrefix predicate on the "Domain" field.
+func DomainHasPrefix(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldHasPrefix(FieldDomain, v))
+}
+
+// DomainHasSuffix applies the HasSuffix predicate on the "Domain" field.
+func DomainHasSuffix(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldHasSuffix(FieldDomain, v))
+}
+
+// DomainIsNil applies the IsNil predicate on the "Domain" field.
+func DomainIsNil() predicate.Deployments {
+	return predicate.Deployments(sql.FieldIsNull(FieldDomain))
+}
+
+// DomainNotNil applies the NotNil predicate on the "Domain" field.
+func DomainNotNil() predicate.Deployments {
+	return predicate.Deployments(sql.FieldNotNull(FieldDomain))
+}
+
+// DomainEqualFold applies the EqualFold predicate on the "Domain" field.
+func DomainEqualFold(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldEqualFold(FieldDomain, v))
+}
+
+// DomainContainsFold applies the ContainsFold predicate on the "Domain" field.
+func DomainContainsFold(v string) predicate.Deployments {
+	return predicate.Deployments(sql.FieldContainsFold(FieldDomain, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

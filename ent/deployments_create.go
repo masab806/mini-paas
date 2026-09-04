@@ -48,6 +48,20 @@ func (_c *DeploymentsCreate) SetRepoURL(v string) *DeploymentsCreate {
 	return _c
 }
 
+// SetDomain sets the "Domain" field.
+func (_c *DeploymentsCreate) SetDomain(v string) *DeploymentsCreate {
+	_c.mutation.SetDomain(v)
+	return _c
+}
+
+// SetNillableDomain sets the "Domain" field if the given value is not nil.
+func (_c *DeploymentsCreate) SetNillableDomain(v *string) *DeploymentsCreate {
+	if v != nil {
+		_c.SetDomain(*v)
+	}
+	return _c
+}
+
 // SetStatus sets the "status" field.
 func (_c *DeploymentsCreate) SetStatus(v string) *DeploymentsCreate {
 	_c.mutation.SetStatus(v)
@@ -230,6 +244,10 @@ func (_c *DeploymentsCreate) createSpec() (*Deployments, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.RepoURL(); ok {
 		_spec.SetField(deployments.FieldRepoURL, field.TypeString, value)
 		_node.RepoURL = value
+	}
+	if value, ok := _c.mutation.Domain(); ok {
+		_spec.SetField(deployments.FieldDomain, field.TypeString, value)
+		_node.Domain = value
 	}
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(deployments.FieldStatus, field.TypeString, value)

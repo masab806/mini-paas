@@ -3,18 +3,20 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+
 	"mini-paas/internals/config"
 	"mini-paas/internals/database"
 	"mini-paas/internals/handlers"
 	"mini-paas/internals/repositories"
 	"mini-paas/internals/routes"
 	"mini-paas/internals/services"
-	"os"
+	"mini-paas/internals/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-func main(){
+func main() {
 	config.LoadConfig()
 
 	r := gin.Default()
@@ -26,7 +28,6 @@ func main(){
 	})
 
 	client, err := database.Connect(os.Getenv("DATABASE_URL"))
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,8 +38,6 @@ func main(){
 
 	logService := services.NewLogService()
 	logHandler := handlers.NewLogHandler(logService)
-
-	
 
 	containerService := services.NewContainerService()
 	containerHandler := handlers.NewContainerHandler(containerService)
@@ -53,7 +52,14 @@ func main(){
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
+	if err := utils.SetupNginx(); err != nil {
+		log.Fatalf(
+			"failed to setup nginx: %v",
+			err,
+		)
+	}
+
 	AIHandler := handlers.NewAIHandler(AIService, logService)
 
 	routes.DeployRoutes(r, deployHandler)
@@ -63,5 +69,4 @@ func main(){
 	routes.AIRoutes(r, AIHandler)
 
 	log.Fatal(r.Run(":8000"))
-
 }

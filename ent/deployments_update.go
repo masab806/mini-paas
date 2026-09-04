@@ -71,6 +71,26 @@ func (_u *DeploymentsUpdate) SetNillableRepoURL(v *string) *DeploymentsUpdate {
 	return _u
 }
 
+// SetDomain sets the "Domain" field.
+func (_u *DeploymentsUpdate) SetDomain(v string) *DeploymentsUpdate {
+	_u.mutation.SetDomain(v)
+	return _u
+}
+
+// SetNillableDomain sets the "Domain" field if the given value is not nil.
+func (_u *DeploymentsUpdate) SetNillableDomain(v *string) *DeploymentsUpdate {
+	if v != nil {
+		_u.SetDomain(*v)
+	}
+	return _u
+}
+
+// ClearDomain clears the value of the "Domain" field.
+func (_u *DeploymentsUpdate) ClearDomain() *DeploymentsUpdate {
+	_u.mutation.ClearDomain()
+	return _u
+}
+
 // SetStatus sets the "status" field.
 func (_u *DeploymentsUpdate) SetStatus(v string) *DeploymentsUpdate {
 	_u.mutation.SetStatus(v)
@@ -187,6 +207,12 @@ func (_u *DeploymentsUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	if value, ok := _u.mutation.RepoURL(); ok {
 		_spec.SetField(deployments.FieldRepoURL, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.Domain(); ok {
+		_spec.SetField(deployments.FieldDomain, field.TypeString, value)
+	}
+	if _u.mutation.DomainCleared() {
+		_spec.ClearField(deployments.FieldDomain, field.TypeString)
+	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(deployments.FieldStatus, field.TypeString, value)
 	}
@@ -281,6 +307,26 @@ func (_u *DeploymentsUpdateOne) SetNillableRepoURL(v *string) *DeploymentsUpdate
 	if v != nil {
 		_u.SetRepoURL(*v)
 	}
+	return _u
+}
+
+// SetDomain sets the "Domain" field.
+func (_u *DeploymentsUpdateOne) SetDomain(v string) *DeploymentsUpdateOne {
+	_u.mutation.SetDomain(v)
+	return _u
+}
+
+// SetNillableDomain sets the "Domain" field if the given value is not nil.
+func (_u *DeploymentsUpdateOne) SetNillableDomain(v *string) *DeploymentsUpdateOne {
+	if v != nil {
+		_u.SetDomain(*v)
+	}
+	return _u
+}
+
+// ClearDomain clears the value of the "Domain" field.
+func (_u *DeploymentsUpdateOne) ClearDomain() *DeploymentsUpdateOne {
+	_u.mutation.ClearDomain()
 	return _u
 }
 
@@ -429,6 +475,12 @@ func (_u *DeploymentsUpdateOne) sqlSave(ctx context.Context) (_node *Deployments
 	}
 	if value, ok := _u.mutation.RepoURL(); ok {
 		_spec.SetField(deployments.FieldRepoURL, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Domain(); ok {
+		_spec.SetField(deployments.FieldDomain, field.TypeString, value)
+	}
+	if _u.mutation.DomainCleared() {
+		_spec.ClearField(deployments.FieldDomain, field.TypeString)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(deployments.FieldStatus, field.TypeString, value)

@@ -46,7 +46,7 @@ func (h *DeployHandler) DeployToServer(c *gin.Context) {
 
 	sanitizedName := strings.ReplaceAll(containerName, " ", "-")
 	
-	deploymentDetails, deployedPath, err := h.service.CloneRepository(c.Request.Context(), req.RepoURL, req.Branch, req.ImageTag, req.Framework, sanitizedName, req.Port, claims.ID)
+	deploymentDetails, publicUrl, deployedPath, err := h.service.CloneRepository(c.Request.Context(), &req.RepoURL, &req.Branch, &req.ImageTag, &req.Framework, &sanitizedName, &req.Port, &claims.ID)
 
 
 	if err != nil {
@@ -62,6 +62,7 @@ func (h *DeployHandler) DeployToServer(c *gin.Context) {
 		"Message": "Deployed!",
 		"Path": deployedPath,
 		"Details": deploymentDetails,
+		"Public Url": publicUrl,
 	})
 
 }
