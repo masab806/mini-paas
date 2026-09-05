@@ -1,50 +1,84 @@
-# 🚀 Self-Orchestrated Mini-PaaS with Event-Driven AIOp
+# 🚀 Mini-PaaS
 
-**Self-Orchastrated Mini-Paas** is a self-hosted, event-driven Mini-PaaS (Platform as a Service) built in Go. It automates container lifecycle management using the Docker Engine API, dynamically routes domain traffic via an Nginx reverse proxy, and features an automated **AIOps diagnostic engine**.
-
-When a container crashes, SentinelPaaS intercepts the event, extracts trailing runtime logs, performs root-cause analysis using the Gemini API with structured JSON output, and dispatches HTML post-mortem reports directly to the application owner.
+A lightweight, high-performance **Platform-as-a-Service (PaaS)** engine built with **Go**, **Gin Gonic**, **Docker Engine API**, **Nginx**, **Cloudflare**, and **Cobra CLI**. Mini-PaaS automates repository cloning, container builds, zero-downtime path-based reverse proxy routing, real-time log streaming, and AI-powered container crash diagnostics.
 
 ---
 
-## ✨ Features
+## 🌟 Key Features
 
-- **Container Lifecycle Management:** Dynamically provision, isolate, and manage user container runtimes via the Docker SDK.
-- **Dynamic Reverse Proxying:** Route external HTTP/HTTPS traffic to running containers with Nginx.
-- **Event-Driven Crash Monitoring:** Asynchronous background worker (`docker.Client.Events`) listening for non-zero container exit (`die`) events in real-time.
-- **Automated AIOps Diagnostics:** Uses Google Gen AI SDK to analyze crash logs and output structured diagnostic payloads (`summary`, `diagnosis`, `solution`, `severity`).
-- **Multi-Tenant Email Alerts:** Automatically resolves container ownership via metadata labels and sends color-coded HTML diagnostic reports to specific users.
-- **Crash Loop Debouncing:** Thread-safe in-memory rate limiting to prevent spam and save API quota during continuous container restarts (`CrashLoopBackOff`).
+- **Automated Deployment Pipeline** — clones source code, builds Docker images, and spins up containers.
+- **Zero-Downtime Dynamic Routing** — embedded Nginx reverse proxy with Docker's internal DNS resolver.
+- **Cloudflare Public Exposure** — secure HTTPS access via Cloudflare Tunnel.
+- **Resilient Proxy Config** — atomic config writes, safe across Windows/Linux.
+- **Log Management** — tail or stream stdout/stderr from any app container.
+- **AI Crash Analysis** — parses failure logs into severity ratings, root causes, and fixes.
+- **Developer CLI** — Cobra + Viper based client for deployments, logs, and diagnostics.
 
 ---
 
-## 🏗️ Architecture Overview
+## 🏗️ System Overview
 
-```text
-  [ User App Container ]
-            │ (Crashes / Non-Zero Exit)
-            ▼
-┌──────────────────────────────────────────────────────────┐
-│                   Docker Engine API                      │
-└───────────────────────────┬──────────────────────────────┘
-                            │ (Die Event Stream)
-                            ▼
-┌──────────────────────────────────────────────────────────┐
-│            SentinelPaaS Event Monitor Worker             │
-│  - Extracts Container ID & User Metadata                 │
-│  - Checks Thread-Safe Debouncer Lock                      │
-│  - Fetches Trailing Stderr/Stdout Logs                   │
-└───────────────────────────┬──────────────────────────────┘
-                            │
-                            ▼
-┌──────────────────────────────────────────────────────────┐
-│                   Gemini AI Engine                       │
-│  - Enforces Structured JSON Output Schema                │
-│  - Generates Diagnosis, Root Cause, and Code Solutions   │
-└───────────────────────────┬──────────────────────────────┘
-                            │
-                            ▼
-┌──────────────────────────────────────────────────────────┐
-│                  Transactional Mailer                    │
-│  - Constructs Styled HTML Email Payload                  │
-│  - Dispatches Incident Report to Container Owner         │
-└──────────────────────────────────────────────────────────┘
+```
+                  +-------------------+
+                  |   Mini-PaaS CLI   |
+                  +---------+---------+
+                            |
+                            v
+                  +-------------------+
+                  |   Gin API Engine  |
+                  +----+--------+-----+
+                       |        |
+     +-----------------+        +-----------------+
+     |                                            |
+     v                                            v
++-------------------+                  +-------------------+
+|   Docker Engine    |                  | Nginx + Cloudflare|
+| - Build & Deploy   |                  |  Reverse Proxy    |
+| - Fetch Logs        |                  |                    |
++-------------------+                  +-------------------+
+```
+
+---
+
+## 🛠️ Prerequisites
+
+- Go `v1.20+`
+- Docker Engine & Docker Compose `v20.10+`
+- Git (available on PATH)
+
+---
+
+## 📦 Setup
+
+Everything runs through three steps: start the proxy, start the API, then build the CLI.
+
+```bash
+# 1. Start the Nginx reverse proxy
+docker compose up -d nginx
+
+# 2. Start the API engine
+go mod tidy && go run main.go
+
+# 3. Build the CLI
+go build -o mini-paas main.go        # Linux/macOS
+sudo mv mini-paas /usr/local/bin/    # optional: add to PATH
+
+# Windows (PowerShell)
+go build -o mini-paas.exe main.go
+```
+
+The `docker-compose.yml` defines the Nginx gateway on an isolated `mini-paas` network — see [`nginx/`](./nginx) for config details.
+
+---
+
+## 💻 Usage
+
+| Command | Description |
+|---|---|
+| `mini-paas deploy -r <repo> -b <branch> -t <tag> -f <framework> -p <port>` | Clone, build, deploy, and route a new app |
+| `mini-paas log -c <container>` | Fetch or stream logs from a running container |
+| `mini-paas diagnose -c <container>` | Run AI crash analysis on container failure logs |
+
+Run `mini-paas --help` or `mini-paas <command> --help` for full flag reference.
+
+---
