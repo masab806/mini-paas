@@ -41,10 +41,10 @@ func NewAIService(ctx context.Context, apiKey string, repo repositories.UserRepo
 }
 
 func (s *AIService) AnalyzeContainerLogs(ctx context.Context, logs string, email string) (*CrashAnalysisResponse, error) {
-	user, userErr := s.repo.GetByEmail(ctx, email)
-	if userErr != nil {
-		return nil, fmt.Errorf("failed to fetch user by email: %w", userErr)
-	}
+	// user, userErr := s.repo.GetByEmail(ctx, email)
+	// if userErr != nil {
+	// 	return nil, fmt.Errorf("failed to fetch user by email: %w", userErr)
+	// }
 
 	config := &genai.GenerateContentConfig{
 		ResponseMIMEType: "application/json",
@@ -94,21 +94,18 @@ func (s *AIService) AnalyzeContainerLogs(ctx context.Context, logs string, email
 		return nil, fmt.Errorf("failed to structure data in JSON: %w", err)
 	}
 
-	// Dispatch structured HTML email via MailService
-	if s.mailService != nil {
-		report := CrashReportData{
-			ContainerID: "app-container", // Pass the actual container/deployment name or ID
-			Summary:     analysis.Summary,
-			Diagnosis:   analysis.Diagonsis,
-			Solution:    analysis.Solution,
-			Severity:    analysis.Severity,
-		}
+	// if s.mailService != nil {
+	// 	report := CrashReportData{
+	// 		ContainerID: "app-container",
+	// 		Summary:     analysis.Summary,
+	// 		Diagnosis:   analysis.Diagonsis,
+	// 		Solution:    analysis.Solution,
+	// 		Severity:    analysis.Severity,
+	// 	}
 
-		if err := s.mailService.SendCrashReport(user.Email, report); err != nil {
-			// Log error without failing the overall request flow
-			fmt.Printf("[AIService] Warning: failed to send crash report email: %v\n", err)
-		}
-	}
+	// 	if err := s.mailService.SendCrashReport(user.Email, report); err != nil {
+	// 		fmt.Printf("[AIService] Warning: failed to send crash report email: %v\n", err)
+	// 	}
 
 	return &analysis, nil
 }

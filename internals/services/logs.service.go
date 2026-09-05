@@ -34,6 +34,12 @@ func SimpleSanitize(raw string) string {
 }
 
 func (s *LogService) GetContainerLogs(ctx context.Context, containerName string, lineNo string) (string, error) {
+	containerName = strings.TrimSpace(containerName)
+	lineNo = strings.TrimSpace(lineNo)
+	if lineNo == "" {
+		lineNo = "100" 
+	}
+
 	cmd := exec.CommandContext(
 		ctx,
 		"docker",
@@ -44,9 +50,12 @@ func (s *LogService) GetContainerLogs(ctx context.Context, containerName string,
 	)
 
 	output, err := cmd.CombinedOutput()
-
 	if err != nil {
-		return "", err
+		outStr := strings.TrimSpace(string(output))
+		if outStr != "" {
+			return "", fmt.Errorf("%s", outStr)
+		}
+		return "", fmt.Errorf("failed to fetch logs for '%s': %w", containerName, err)
 	}
 
 	finalResult := SimpleSanitize(string(output))

@@ -18,6 +18,10 @@ type NginxRoute struct {
 	Port          string
 }
 
+func sanitizeVarName(s string) string {
+	r := strings.NewReplacer("-", "_", ".", "_", "/", "_")
+	return r.Replace(s)
+}
 
 func SetupNginx() error {
 	if err := os.MkdirAll("./nginx/conf.d", 0755); err != nil {
@@ -32,8 +36,10 @@ func SetupNginx() error {
     listen 80;
     server_name _;
 
+    resolver 127.0.0.11 valid=10s ipv6=off;
+
     location / {
-        return 404;
+        return 404 "Mini-PaaS Router: Route not found";
     }
 }
 `
@@ -116,45 +122,36 @@ func GenerateNginxConfig(routes []NginxRoute) error {
     listen 80;
     server_name _;
 
-`)
+    resolver 127.0.0.11 valid=10s ipv6=off;
 
-	if len(routes) == 0 {
-		config.WriteString(`    location / {
-        return 404;
+    location / {
+        return 404 "Mini-PaaS Router: Route not found";
     }
+
 `)
-	} else {
-		for _, route := range routes {
-			if strings.TrimSpace(route.Domain) == "" {
-				return fmt.Errorf(
-					"nginx domain cannot be empty",
-				)
-			}
 
-			if strings.TrimSpace(route.ContainerName) == "" {
-				return fmt.Errorf(
-					"nginx container name cannot be empty",
-				)
-			}
+	for _, route := range routes {
+		if strings.TrimSpace(route.Domain) == "" {
+			return fmt.Errorf("nginx domain cannot be empty")
+		}
 
-			if strings.TrimSpace(route.Port) == "" {
-				return fmt.Errorf(
-					"nginx port cannot be empty",
-				)
-			}
+		if strings.TrimSpace(route.ContainerName) == "" {
+			return fmt.Errorf("nginx container name cannot be empty")
+		}
 
-			domain := strings.Trim(
-				route.Domain,
-				"/",
-			)
+		if strings.TrimSpace(route.Port) == "" {
+			return fmt.Errorf("nginx port cannot be empty")
+		}
 
-			containerName := strings.TrimSpace(route.ContainerName)
+		domain := strings.Trim(route.Domain, "/")
+		containerName := strings.TrimSpace(route.ContainerName)
+		port := strings.TrimSpace(route.Port)
+		varName := sanitizeVarName(domain)
 
-			port := strings.TrimSpace(route.Port)
-
-			config.WriteString(
-				fmt.Sprintf(`    location /%s/ {
-        proxy_pass http://%s:%s/;
+		config.WriteString(
+			fmt.Sprintf(`    location /%s/ {
+        set $upstream_%s http://%s:%s/;
+        proxy_pass $upstream_%s;
 
         proxy_http_version 1.1;
 
@@ -170,9 +167,8 @@ func GenerateNginxConfig(routes []NginxRoute) error {
         proxy_send_timeout 300s;
     }
 
-`, domain, containerName, port),
-			)
-		}
+`, domain, varName, containerName, port, varName),
+		)
 	}
 
 	config.WriteString(`}
@@ -195,10 +191,13 @@ func GenerateNginxConfig(routes []NginxRoute) error {
 		tempFile,
 		NginxConfigFile,
 	); err != nil {
-		return fmt.Errorf(
-			"failed to replace nginx config: %w",
-			err,
-		)
+		_ = os.Remove(NginxConfigFile)
+		if err := os.Rename(tempFile, NginxConfigFile); err != nil {
+			return fmt.Errorf(
+				"failed to replace nginx config: %w",
+				err,
+			)
+		}
 	}
 
 	return ReloadNginx()

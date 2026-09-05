@@ -22,34 +22,34 @@ func NewAIHandler(aiService *services.AIService, logService *services.LogService
 
 func (h *AIHandler) AnalyzeLogs(c *gin.Context) {
 	var req dto.AnalyzeLogResponse
-	
-	err := c.ShouldBindJSON(&req); if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"Error": err.Error(),
-		})
 
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
 	logs, logErr := h.LogService.GetContainerLogs(c.Request.Context(), req.ContainerName, req.LineNo)
-
 	if logErr != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"Error": logErr.Error(),
+			"error": logErr.Error(),
 		})
+		return 
 	}
 
 	result, analyzeErr := h.AiService.AnalyzeContainerLogs(c.Request.Context(), logs, "")
-
 	if analyzeErr != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"Error": analyzeErr.Error(),
+			"error": analyzeErr.Error(),
 		})
+		return 
 	}
 
-	c.JSON(200, gin.H{
-		"message": "Logs Verified",
-		"Logs": result,
+	c.JSON(http.StatusOK, gin.H{
+		"severity":  result.Severity,
+		"summary":   result.Summary,
+		"diagnosis": result.Diagonsis,
+		"solution":  result.Solution,
 	})
-
-} 
+}

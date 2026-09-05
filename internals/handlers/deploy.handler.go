@@ -36,6 +36,8 @@ func (h *DeployHandler) DeployToServer(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"Error": "Unauthorized",
 		})
+
+		return
 	}
 
 	randomNum := uuid.NewString()
@@ -58,11 +60,12 @@ func (h *DeployHandler) DeployToServer(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"Message": "Deployed!",
-		"Path": deployedPath,
-		"Details": deploymentDetails,
-		"Public Url": publicUrl,
+	c.JSON(http.StatusOK, gin.H{
+		"message":        "Deployed!",
+		"path":           deployedPath,
+		"details":        deploymentDetails,
+		"public_url":     publicUrl,
+		"container_name": sanitizedName,
 	})
 
 }

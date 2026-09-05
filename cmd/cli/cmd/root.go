@@ -89,6 +89,10 @@ func GetToken() (string, error) {
 }
 
 func SendHttpRequest(method, endpoint string, body interface{}, requiresAuth bool) ([]byte, error) {
+	if baseUrl == "" {
+		baseUrl = "http://localhost:8000"
+	}
+	
 	var bodyReader io.Reader
 
 	if body != nil {

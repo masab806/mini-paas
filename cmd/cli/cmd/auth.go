@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/spf13/cobra"
 )
 
 var registerCmd = &cobra.Command{
-	Use: "register",
+	Use:   "register",
 	Short: "Create an account for mini-paas",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email, _ := cmd.Flags().GetString("email")
@@ -15,11 +16,11 @@ var registerCmd = &cobra.Command{
 		password, _ := cmd.Flags().GetString("password")
 
 		payload := map[string]string{
-			"email": email,
+			"email":    email,
 			"username": username,
 			"password": password,
 		}
-		
+
 		resp, err := SendHttpRequest("POST", "/api/user/create", payload, false)
 
 		if err != nil {
@@ -34,14 +35,14 @@ var registerCmd = &cobra.Command{
 }
 
 var loginCmd = &cobra.Command{
-	Use: "login",
+	Use:   "login",
 	Short: "Login Into mini-paas",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email, _ := cmd.Flags().GetString("email")
 		password, _ := cmd.Flags().GetString("password")
 
 		payload := map[string]string{
-			"email": email,
+			"email":    email,
 			"password": password,
 		}
 
@@ -51,9 +52,24 @@ var loginCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Println("Login Response: ")
-		fmt.Println(string(resp))
+		var resStruct struct {
+			Message string `json:"Message"`
+			Token   string `json:"token"`
+		}
 
+		if err := json.Unmarshal(resp, &resStruct); err != nil {
+			return fmt.Errorf("failed to parse response: %w", err)
+		}
+
+		if resStruct.Token == "" {
+			return fmt.Errorf("login failed: token missing from response")
+		}
+
+		if err := SaveToken(resStruct.Token); err != nil {
+			return fmt.Errorf("failed to save token: %w", err)
+		}
+
+		fmt.Println("\n✨ Logged in successfully!")
 		return nil
 	},
 }
